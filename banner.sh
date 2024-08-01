@@ -154,6 +154,72 @@ mostrar_menu() {
     echo -ne "${MAGENTA}[*]Ingrese su opción [1-3]:${RESET}"
 }
 
+#Instalacion de Arch Linux 
+install_ArchLinux(){
+
+    ARCH_LINUX_URL="http://os.archlinuxarm.org/os/ArchLinuxARM-rpi-armv7-latest.tar.gz"
+    directorio_actual=$(pwd)
+    cadena_adicional="/ArchLinuxARM-rpi-armv7-latest.tar.gz"
+    IMAGE_PATH="${directorio_actual}${cadena_adicional}"
+    SD_CARD="/dev/sdb"  # Cambia esto a la ruta de tu tarjeta SD (e.g., /dev/sdb)
+
+    # Verificar permisos de superusuario
+    if [[ $EUID -ne 0 ]]; then
+        echo "Este script debe ejecutarse con permisos de superusuario (root)." 
+        exit 1
+    fi
+
+    # Descargar la imagen de Arch Linux ARM
+    echo -e "${YELLOW}Descargando la imagen de Arch Linux ARM...${RESET}"
+    wget "$ARCH_LINUX_URL" -O "$IMAGE_PATH"
+
+    # Formatear la tarjeta SD
+    echo -e "${YELLOW}Formateando la tarjeta SD...${RESET}"
+    fdisk "$SD_CARD" <<EOT
+o
+p
+n
+p
+1
+
++200M
+t
+c
+n
+p
+2
+y
+
+
+
+
+w
+EOT
+
+    # Crear sistema de archivos
+    echo -e "${YELLOW}Creando sistema de archivos...${RESET}"
+    mkfs.vfat ${SD_CARD}1
+    mkdir -p boot
+    mount ${SD_CARD}1 boot
+
+    mkfs.ext4 ${SD_CARD}2
+    mkdir -p root
+    mount ${SD_CARD}2 root
+
+    # Extraer la imagen
+    echo -e "${YELLOW}Extrayendo la imagen...${RESET}"
+    tar -xzf "$IMAGE_PATH" -C root/ >&/dev/null
+
+    # Sincronizar y desmontar
+    echo -e "${YELLOW}Sincronizando y desmontando...${RESET}"
+    sync
+    mv root/boot/* boot
+    umount boot root
+    
+    echo -e "${MAGENTA}La instalación de Arch Linux ARM en la Raspberry Pi 3 B se ha completado.${RESET}"
+    rm -rf ArchLinuxARM-rpi-armv7-latest.tar.gz boot/ root/
+}
+
 # Función para manejar la selección del menú
 seleccion_opcion_menu() {
     local choice
@@ -167,6 +233,7 @@ seleccion_opcion_menu() {
             ;;
         3)
             echo "Instalacion de Arch Linux"
+            install_ArchLinux
             ;;
         x)
             echo "Modificacion de version"
