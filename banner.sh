@@ -1,19 +1,29 @@
 #!/bin/bash
 
-# Función para mostrar una barra de progreso con Pac-Man comiendo
-show_progress() {
-    local total=30  # Número total de pasos para la barra de progreso
-    local progress=0
-    local pacman_chars=("🐧" "🍇" "💻" "🔧" "📡")  # Caracteres de animación
+# Definición de colores
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
+CYAN='\033[0;36m'
+WHITE='\033[0;37m'
+RESET='\033[0m'  # Resetear colores a los valores por defecto
 
-    echo "Verificando conexión a internet..."
+# Función para mostrar una barra de progreso con Pac-Man comiendo
+mostrar_progreso() {
+    local total=3  # Número total de pasos para la barra de progreso
+    local progress=0
+    local icon_chars=("🐧" "🍇" "💻" "🔧" "📡")  # Caracteres de animación
+    clear
+    echo -e "${GREEN}Verificando conexión a internet ${RESET}"
 
     while [[ $progress -le $total ]]; do
         # Ejecutar un ping a google.com con un límite de tiempo
-        if ping -c 1 www.google.com &> /dev/null; then
+        if ping -c 3 www.google.com &> /dev/null; then
             progress=$((progress + 1))
         else
-            echo -e "\n${Bred}[⚠️] Sin conexión a internet. Verifique su conexion.${reset}"
+            echo -e "\n${RED}[⚠️] Sin conexión a internet. Verifique su conexion.${RESET}"
             break
         fi
 
@@ -23,19 +33,20 @@ show_progress() {
         local left=$((50 - done))
 
         # Determinar el carácter de Pac-Man actual
-        local pacman_index=$((progress % ${#pacman_chars[@]}))
-        local pacman="${pacman_chars[$pacman_index]}"
+        local icon_index=$((progress % ${#icon_chars[@]}))
+        local icon="${icon_chars[$icon_index]}"
 
         # Mostrar la barra de progreso con Pac-Man comiendo
+
         printf "\r["
-        printf "%s" "$pacman"
+        printf "%s" "$icon"
         printf "%0.s#" $(seq 1 $done)
         printf "%0.s-" $(seq 1 $left)
         printf "] %d%%" $percent
 
         # Verificar si la conexión es estable
         if [[ $progress -ge $total ]]; then
-            echo -e "\nConexión a internet verificada."
+            echo -e "\n${CYAN}[✅]Conexión a internet verificada.${RESET}"
             break
         fi
 
@@ -44,106 +55,61 @@ show_progress() {
     done
 }
 
-# Función para mostrar la tabla de dispositivos de almacenamiento conectados
-show_storage_devices() {
-    echo "Cargando lista de dispositivos de almacenamiento..."
-    echo
-    
-    # Ejecutar lsblk y formatear la salida en una tabla
-    lsblk -o NAME,SIZE,TYPE -e 3 | awk '
-    BEGIN {
-        print "Device   Size    Type"
-        print "------ ------ ----\n"
-    }
-    NR > 1 {  # Omitir la primera línea de encabezado de lsblk
-        printf "%-3s %-7s %-5s\n", $1, $2, $3
-    }' | column -t
-}
-
-# Función para mostrar los nombres principales de los dispositivos de almacenamiento conectados
-show_main_device_names() {
-    echo "Cargando lista de dispositivos de almacenamiento..."
-
-    # Inicializar el contador
-    local count=1
-
-    # Ejecutar lsblk y extraer solo los nombres principales de los dispositivos
-    lsblk -o NAME,TYPE -e 7 | awk -v cnt="$count" '
-    BEGIN {
-        # Imprimir cabecera
-        printf "+-----+-----------------+\n"
-        printf "| No  | Device          |\n"
-        printf "+-----+-----------------+\n"
-    }
-    NR > 1 {
-        if ($2 == "disk") {
-            printf "| %-3d | %-15s |\n", cnt, $1
-            cnt++
-        }
-    }
-    END {
-        # Imprimir pie de la tabla
-        printf "+-----+-----------------+\n"
-    }' | column -t -s '|'
-}
-
 # Función para solicitar al usuario que seleccione un dispositivo
-select_device() {
-    # Mostrar la lista de dispositivos
-    show_main_device_names
+seleccion_almacenamiento() {
+    clear
+    echo "Listando dispositivos y sus tamaños:"
+    echo -e "${YELLOW}+------------------------------------+${RESET}"
+    
+    # Obtener la lista de dispositivos y tamaños
+    mapfile -t dispositivos < <(sudo fdisk -l | grep '^Disk /dev/' | awk '{print $2, $3, $4}' | sed 's/,$//')
 
-    # Pedir al usuario que seleccione un número
-    echo -n "Seleccione el número del dispositivo de almacenamiento (0 para salir): "
-    read -r choice
+    # Mostrar la lista numerada de dispositivos
+    for i in "${!dispositivos[@]}"; do
+        echo -e "${YELLOW}|>${RESET} [$((i+1))] ${YELLOW}|${RESET} ${dispositivos[$i]} "
+    done
+    echo -e "${YELLOW}+------------------------------------+${RESET}"
 
-    # Validar la selección
-    if [[ $choice =~ ^[0-9]+$ ]]; then
-        if [[ $choice -eq 0 ]]; then
-            echo "Saliendo..."
-            exit 0
-        fi
-        
-        # Obtener el nombre del dispositivo seleccionado
-        device=$(lsblk -o NAME,TYPE -e 7 | awk -v num=$((choice + 1)) '
-        NR == num+1 && $2 == "disk" { print $1 }')
+    # Solicitar al usuario que seleccione un dispositivo por número
+    echo -en "${MAGENTA}Selecciona el número del dispositivo: ${RESET}"
+    read -r seleccion
 
-        if [[ -n $device ]]; then
-            echo "Has seleccionado el dispositivo: $device"
-            # Aquí puedes agregar más código para trabajar con el dispositivo seleccionado
-        else
-            echo "Selección inválida. Por favor, intente nuevamente."
-            select_device
-        fi
+    # Verificar si la selección es válida
+    if (( seleccion > 0 && seleccion <= ${#dispositivos[@]} )); then
+        dispositivo_seleccionado="${dispositivos[$((seleccion-1))]}"
+        clear
+        echo -e "${CYAN}[✅] Has seleccionado: $dispositivo_seleccionado ${RESET}"
     else
-        echo "Entrada inválida. Por favor, ingrese un número."
-        select_device
+        echo -e "\n${RED}[⚠️ ] Selección no válida. Por favor, intenta de nuevo.${RESET}"
+        sleep 2
+        seleccion_almacenamiento
     fi
 }
 
 # Función para el banner de texto
 print_banner() {
-    echo "#------------------------------#"
-    echo " Instalación de Arch Linux ARM"
-    echo "      en Raspberry Pi 3 B"
-    echo "#------------------------------#"
+    echo -e "#---------------------------------------------#"
+    echo -e "\t Instalación de Arch Linux ARM"
+    echo -e "\t      en Raspberry Pi 3 B"
+    echo -e "#---------------------------------------------#"
 }
 
 # Función para el logotipo de Raspberry Pi
 print_raspberry_icon() {
-    echo "        .~~.   .~~.                "
-    echo "       '. \ ' ' / .'               "
-    echo "        .~ .~~~..~.               "
-    echo "       : .~.'~'.~. :              "
-    echo "      ~ (   ) (   ) ~             "
-    echo "     ( : '~'.~.'~' : )           "
-    echo "      ~ .~ (   ) ~. ~             "
-    echo "       (  : '~' :  )             "
-    echo "        '~ .~~~. ~'             "
-    echo "            '~'                "
+    echo -e "\t        .~~.   .~~.                "
+    echo -e "\t        '. \ ' ' /.'               "
+    echo -e "\t         .~ .~~~..~.               "
+    echo -e "\t        : .~.'~'.~. :              "
+    echo -e "\t       ~ (   ) (   ) ~             "
+    echo -e "\t      ( : '~'.~.'~' : )           "
+    echo -e "\t       ~ .~ (   ) ~. ~             "
+    echo -e "\t        (  : '~' :  )             "
+    echo -e "\t         '~ .~~~. ~'             "
+    echo -e "\t             '~'                "
 }
 
 # Función para imprimir el banner e ícono centrados
-print_centered() {
+print_centrado() {
     local banner=$(print_banner)
     local icon=$(print_raspberry_icon)
     
@@ -175,33 +141,35 @@ print_centered() {
 }
 
 # Función para mostrar el menú en formato de tabla
-show_menu() {
+mostrar_menu() {
     echo
-    echo " Seleccione una opción:"
-    echo "+-------------------------------------------+"
-    echo "| 1. Verificar conexión a internet           |"
-    echo "| 2. Selección de Micro SD                  |"
-    echo "| 3. Modificación de versión de Raspberry Pi |"
-    echo "+-------------------------------------------+"
-    echo -n " Ingrese su opción [1-3]: "
+    echo -e "${GREEN}+---------------------------------------------+${RESET}"
+    echo -e "${GREEN}\t    Seleccione una opción:${RESET}"
+    echo -e "${GREEN}+---------------------------------------------+${RESET}"
+    echo -e "${GREEN}|${RESET} 1. Verificar conexión a internet           ${GREEN} |${RESET}"
+    echo -e "${GREEN}|${RESET} 2. Selección de Micro SD                   ${GREEN} |${RESET}"
+    echo -e "${GREEN}|${RESET} 3. Instalación de Arch Linux               ${GREEN} |${RESET}"
+    echo -e "${GREEN}|${RESET} x. Versión de Raspberry Pi                 ${GREEN} |${RESET}"
+    echo -e "${GREEN}+---------------------------------------------+${RESET}"
+    echo -ne "${MAGENTA}[*]Ingrese su opción [1-3]:${RESET}"
 }
 
 # Función para manejar la selección del menú
-handle_menu_selection() {
+seleccion_opcion_menu() {
     local choice
     read -r choice
     case $choice in
         1)
-            show_progress
+            mostrar_progreso
             ;;
         2)
-            echo "Seleccionando Micro SD..."
-            #show_storage_devices
-            select_device
+            seleccion_almacenamiento
             ;;
         3)
-            echo "Modificando la versión de Raspberry Pi..."
-            # Aquí puedes agregar el código para modificar la versión de Raspberry Pi
+            echo "Instalacion de Arch Linux"
+            ;;
+        x)
+            echo "Modificacion de version"
             ;;
         *)
             echo "Opción inválida. Por favor, seleccione una opción válida."
@@ -209,11 +177,9 @@ handle_menu_selection() {
     esac
 }
 
-# Mostrar el banner e ícono
-print_centered
+print_centrado
 
-# Mostrar el menú y manejar la selección del usuario
 while true; do
-    show_menu
-    handle_menu_selection
+    mostrar_menu
+    seleccion_opcion_menu
 done
