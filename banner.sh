@@ -77,6 +77,7 @@ seleccion_almacenamiento() {
     # Verificar si la selección es válida
     if (( seleccion > 0 && seleccion <= ${#dispositivos[@]} )); then
         dispositivo_seleccionado="${dispositivos[$((seleccion-1))]}"
+        almacenamiento="${dispositivos[$((seleccion-1))]}"
         clear
         echo -e "${CYAN}[✅] Has seleccionado: $dispositivo_seleccionado ${RESET}"
     else
@@ -140,6 +141,29 @@ print_centrado() {
     done
 }
 
+#Informacion de Raspberry Pi compatibles con Arch Linux
+print_info(){
+    clear
+    echo
+    echo -e "${GREEN}+---------------------------------------------+${RESET}"
+    echo -e "${RED}    Versiones compatibles de Raspberry Pi:${RESET}"
+    echo -e "${GREEN}+---------------------------------------------+${RESET}"
+    echo -e "${GREEN}|${RESET} \t\t1. Raspberry Pi 2            ${GREEN} |${RESET}"
+    echo -e "${GREEN}|${RESET} \t\t   - Model B                 ${GREEN} |${RESET}"
+    echo -e "${GREEN}|${RESET} \t\t2. Raspberry Pi 3            ${GREEN} |${RESET}"
+    echo -e "${GREEN}|${RESET} \t\t   - Model B                 ${GREEN} |${RESET}"
+    echo -e "${GREEN}|${RESET} \t\t   - Model B+                ${GREEN} |${RESET}"
+    echo -e "${GREEN}|${RESET} \t\t3. Raspberry Pi 4            ${GREEN} |${RESET}"
+    echo -e "${GREEN}|${RESET} \t\t   - Model B                 ${GREEN} |${RESET}"
+    echo -e "${GREEN}|${RESET} \t\t4. Raspberry Pi Zero         ${GREEN} |${RESET}"
+    echo -e "${GREEN}|${RESET} \t\t   - Zero                    ${GREEN} |${RESET}"
+    echo -e "${GREEN}|${RESET} \t\t   - Zero W                  ${GREEN} |${RESET}"
+    echo -e "${GREEN}|${RESET} \t\t   - Zero WH                 ${GREEN} |${RESET}"
+    echo -e "${GREEN}+---------------------------------------------+${RESET}"
+    echo -e "${GREEN}|🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇|${RESET}"
+    
+}
+
 # Función para mostrar el menú en formato de tabla
 mostrar_menu() {
     echo
@@ -149,7 +173,7 @@ mostrar_menu() {
     echo -e "${GREEN}|${RESET} 1. Verificar conexión a internet           ${GREEN} |${RESET}"
     echo -e "${GREEN}|${RESET} 2. Selección de Micro SD                   ${GREEN} |${RESET}"
     echo -e "${GREEN}|${RESET} 3. Instalación de Arch Linux               ${GREEN} |${RESET}"
-    echo -e "${GREEN}|${RESET} x. Versión de Raspberry Pi                 ${GREEN} |${RESET}"
+    echo -e "${GREEN}|${RESET} x. Versiónes compatibles de Raspberry Pi   ${GREEN} |${RESET}"
     echo -e "${GREEN}+---------------------------------------------+${RESET}"
     echo -ne "${MAGENTA}[*]Ingrese su opción [1-3]:${RESET}"
 }
@@ -161,7 +185,11 @@ install_ArchLinux(){
     directorio_actual=$(pwd)
     cadena_adicional="/ArchLinuxARM-rpi-armv7-latest.tar.gz"
     IMAGE_PATH="${directorio_actual}${cadena_adicional}"
-    SD_CARD="/dev/sdb"  # Cambia esto a la ruta de tu tarjeta SD (e.g., /dev/sdb)
+    #SD_CARD=$(echo "${dispositivo_seleccionado}" | cut -d':' -f1) # Cambia esto a la ruta de tu tarjeta SD (e.g., /dev/sdb)
+    SD_CARD="/dev/sdb"
+
+    #Formateo de MicroSD, creacion de tabla de particion
+    sudo parted "$SD_CARD" mklabel gpt
 
     # Verificar permisos de superusuario
     if [[ $EUID -ne 0 ]]; then
@@ -236,7 +264,7 @@ seleccion_opcion_menu() {
             install_ArchLinux
             ;;
         x)
-            echo "Modificacion de version"
+            print_info
             ;;
         *)
             echo "Opción inválida. Por favor, seleccione una opción válida."
