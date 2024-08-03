@@ -178,74 +178,136 @@ mostrar_menu() {
     echo -ne "${MAGENTA}[*]Ingrese su opción [1-3]:${RESET}"
 }
 
+show_progress() {
+    local progress=$1
+    local total=$2
+    local width=50
+
+    local pct=$((progress * 100 / total))
+    local filled=$((pct * width / 100))
+    local empty=$((width - filled))
+
+    printf "["
+    printf "%0.s#" $(seq 1 $filled)
+    printf "%0.s-" $(seq 1 $empty)
+    printf "] %d%%\r" $pct
+}
+
+
 #Instalacion de Arch Linux 
-install_ArchLinux(){
+install_ArchLinux() {
+    clear
+    SD_CARD=$(echo "${dispositivo_seleccionado}" | cut -d':' -f1) # Cambia esto a la ruta de tu tarjeta SD (e.g., /dev/sdb)
+    estatus="-"
 
-    ARCH_LINUX_URL="http://os.archlinuxarm.org/os/ArchLinuxARM-rpi-armv7-latest.tar.gz"
-    directorio_actual=$(pwd)
-    cadena_adicional="/ArchLinuxARM-rpi-armv7-latest.tar.gz"
-    IMAGE_PATH="${directorio_actual}${cadena_adicional}"
-    #SD_CARD=$(echo "${dispositivo_seleccionado}" | cut -d':' -f1) # Cambia esto a la ruta de tu tarjeta SD (e.g., /dev/sdb)
-    SD_CARD="/dev/sdb"
+    if [ -z "$SD_CARD" ]; then
+        echo -e "${BLUE}+---------------------------------------------------+${RESET}"
+        echo -e "${RED} Error: No se ha especificado el dispositivo MicroSD${RESET}"
+        echo -e "${BLUE}+---------------------------------------------------+${RESET}"
+        echo ""
+        return
+    fi
 
-    #Formateo de MicroSD, creacion de tabla de particion
-    sudo parted "$SD_CARD" mklabel gpt
+    # Crear tabla de particiones y particiones
+    echo -e "${GREEN}+---------------------------------------------+${RESET}"
+    echo -e "${GREEN}  Creando tabla de particiones y particiones${RESET}"
+    echo -e "${GREEN}+---------------------------------------------+${RESET}"
+    yes | sudo parted ${SD_CARD} mklabel msdos >&/dev/null
+    yes | sudo parted -a optimal ${SD_CARD} mkpart primary fat32 0% 200MB >&/dev/null
+    yes | sudo parted -a optimal ${SD_CARD} mkpart primary ext4 200MB 100% >&/dev/null
+    echo -e "${GREEN}|${RESET}${BLUE}   [✅] Creación de particiones.${RESET}${GREEN}             |${RESET}"
 
-    # Verificar permisos de superusuario
-    if [[ $EUID -ne 0 ]]; then
-        echo "Este script debe ejecutarse con permisos de superusuario (root)." 
+    # Formatear particiones
+    sudo mkfs.vfat ${SD_CARD}1 >&/dev/null
+    yes | sudo mkfs.ext4 -F ${SD_CARD}2 >&/dev/null
+    if [ $? -eq 0 ]; then
+        estatus="✅"
+    else
+        estatus="❌"
+    fi
+    echo -e "${GREEN}|${RESET}${BLUE}   [${estatus}] Formateo particiones.${RESET}${GREEN}                |${RESET}"
+
+    # Crear directorios de montaje
+    sudo mkdir -p /mnt/boot >&/dev/null
+    sudo mkdir -p /mnt/root >&/dev/null
+    if [ $? -eq 0 ]; then
+        estatus="✅"
+    else
+        estatus="❌"
+    fi
+    echo -e "${GREEN}|${RESET}${BLUE}   [${estatus}] Creación de directorios de montaje.${RESET}${GREEN}  |${RESET}"
+
+    # Montar particiones
+    sudo mount ${SD_CARD}1 /mnt/boot >&/dev/null
+    sudo mount ${SD_CARD}2 /mnt/root >&/dev/null
+    if [ $? -eq 0 ]; then
+        estatus="✅"
+    else
+        estatus="❌"
+    fi
+    echo -e "${GREEN}|${RESET}${BLUE}   [${estatus}] Montaje de particiones.${RESET}${GREEN}              |${RESET}"
+
+  # Descargar la imagen
+    wget --show-progress -q http://os.archlinuxarm.org/os/ArchLinuxARM-rpi-armv7-latest.tar.gz 
+    tput cuu1 && tput el
+    # Comprobar si la descarga fue exitosa
+    if [ $? -eq 0 ]; then
+      estatus="✅"
+     # Mover el cursor hacia arriba para la barra de progreso y borrar la línea
+        tput cuu1 && tput el
+        echo -e "${GREEN}|${RESET}${BLUE}   [${estatus}] Descarga de Arch Linux completo.${RESET}${GREEN}|${RESET}"
+    else
+        estatus="❌"
+        echo -e "${GREEN}|${RESET}${BLUE}   [${estatus}] Error en la descarga.${RESET}${GREEN}           |${RESET}"
+    fi
+
+    # Verificar que la descarga fue exitosa
+    if [ ! -f ArchLinuxARM-rpi-armv7-latest.tar.gz ]; then
+        echo -e "${RED}|${RESET}${BLUE}   [❌] Error: La descarga de la imagen falló.${RESET}${RED}       |${RESET}"
         exit 1
     fi
 
-    # Descargar la imagen de Arch Linux ARM
-    echo -e "${YELLOW}Descargando la imagen de Arch Linux ARM...${RESET}"
-    wget "$ARCH_LINUX_URL" -O "$IMAGE_PATH"
+    # Extraer la imagen en la partición raíz
+    sudo tar -xzf ArchLinuxARM-rpi-armv7-latest.tar.gz -C /mnt/root >&/dev/null
+    if [ $? -eq 0 ]; then
+        estatus="✅"
+    else
+        estatus="❌"
+    fi
+    echo -e "${GREEN}|${RESET}${BLUE}   [${estatus}] Extracción de imagen correctamente.${RESET}${GREEN}  |${RESET}"
 
-    # Formatear la tarjeta SD
-    echo -e "${YELLOW}Formateando la tarjeta SD...${RESET}"
-    fdisk "$SD_CARD" <<EOT
-o
-p
-n
-p
-1
+    # Mover archivos de boot
+    sudo mv /mnt/root/boot/* /mnt/boot/
+    if [ $? -eq 0 ]; then
+        estatus="✅"
+    else
+        estatus="❌"
+    fi
+    echo -e "${GREEN}|${RESET}${BLUE}   [${estatus}] Moviendo archivos correctamente.${RESET}${GREEN}     |${RESET}"
 
-+200M
-t
-c
-n
-p
-2
-y
+    # Desmontar particiones
+    sudo umount /mnt/boot
+    sudo umount /mnt/root
+    if [ $? -eq 0 ]; then
+        estatus="✅"
+    else
+        estatus="❌"
+    fi
+    echo -e "${GREEN}|${RESET}${BLUE}   [${estatus}] Desmontando particion correctamente.${RESET}${GREEN} |${RESET}"
 
-
-
-
-w
-EOT
-
-    # Crear sistema de archivos
-    echo -e "${YELLOW}Creando sistema de archivos...${RESET}"
-    mkfs.vfat ${SD_CARD}1
-    mkdir -p boot
-    mount ${SD_CARD}1 boot
-
-    mkfs.ext4 ${SD_CARD}2
-    mkdir -p root
-    mount ${SD_CARD}2 root
-
-    # Extraer la imagen
-    echo -e "${YELLOW}Extrayendo la imagen...${RESET}"
-    tar -xzf "$IMAGE_PATH" -C root/ >&/dev/null
-
-    # Sincronizar y desmontar
-    echo -e "${YELLOW}Sincronizando y desmontando...${RESET}"
+    # Sincronizar y limpiar
     sync
-    mv root/boot/* boot
-    umount boot root
-    
-    echo -e "${MAGENTA}La instalación de Arch Linux ARM en la Raspberry Pi 3 B se ha completado.${RESET}"
-    rm -rf ArchLinuxARM-rpi-armv7-latest.tar.gz boot/ root/
+    sudo rm -rf /mnt/boot/
+    sudo rm -rf /mnt/root/
+    rm -f ArchLinuxARM-rpi-armv7-latest.tar.gz
+    if [ $? -eq 0 ]; then
+        estatus="✅"
+    else
+        estatus="❌"
+    fi
+    echo -e "${GREEN}|${RESET}${BLUE}   [${estatus}] Sincronización y limpieza.${RESET}${GREEN}           |${RESET}"
+    echo -e "${GREEN}+---------------------------------------------+${RESET}"
+    echo -e "\n${GREEN}[✅] La instalación de Arch Linux ARM en la Raspberry Pi 3 B se ha completado.${RESET}"
 }
 
 # Función para manejar la selección del menú
@@ -260,7 +322,6 @@ seleccion_opcion_menu() {
             seleccion_almacenamiento
             ;;
         3)
-            echo "Instalacion de Arch Linux"
             install_ArchLinux
             ;;
         x)
@@ -272,7 +333,7 @@ seleccion_opcion_menu() {
     esac
 }
 
-print_centrado
+#print_centrado
 
 while true; do
     mostrar_menu
