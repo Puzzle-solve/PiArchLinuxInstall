@@ -44,15 +44,60 @@ mostrar_progreso() {
         printf "%0.s-" $(seq 1 $left)
         printf "] %d%%" $percent
 
-        # Verificar si la conexión es estable
+            # Verificar si la conexión es estable
         if [[ $progress -ge $total ]]; then
             echo -e "\n${CYAN}[✅]Conexión a internet verificada.${RESET}"
+            sleep 5
+            clear
+            install_parted
             break
         fi
 
-        # Esperar un segundo antes de volver a intentar
-        sleep 1
+       
     done
+}
+
+# Función para verificar e instalar parted
+install_parted() {
+
+    if command -v parted &> /dev/null; then
+        echo -e "${GREEN}[✅] Herramientas instaladas correctamente.${RESET}"
+    else
+        echo -e "${RED}[⚠️] parted no está instalado. Intentando instalarlo.${RESET}"
+
+            if command -v apt &> /dev/null; then
+                sudo apt install -y parted #Debian
+            elif command -v dnf &> /dev/null; then
+                sudo dnf install -y parted #Fedora
+            elif command -v yum &> /dev/null; then
+                sudo yum install -y parted #Redhat
+            elif command -v pacman &> /dev/null; then
+                sudo pacman -S --noconfirm parted #Arch Linux
+            elif command -v zypper &> /dev/null; then
+                sudo zypper install -y parted #Open Suse
+            elif command -v apk &> /dev/null; then
+                sudo apk add parted #Alpine Linux
+            elif command -v xbps-install &> /dev/null; then
+                sudo xbps-install -S parted #Void Linux
+            elif command -v eopkg &> /dev/null; then
+                sudo eopkg it parted #Solus
+            elif command -v guix &> /dev/null; then
+                sudo guix package -i parted #GNU Guix System
+            elif command -v nix &> /dev/null; then
+                sudo nix-env -iA nixpkgs.parted #NixOS
+            else
+                echo -e "${RED}[⚠️] Distribución no soportada o desconocida. Por favor instala parted manualmente.${RESET}"
+                return 1
+            fi
+       
+            # Verificar si la instalación fue exitosa
+            if command -v parted &> /dev/null; then
+                echo -e "${GREEN}[✅] parted se ha instalado correctamente.${RESET}"
+            else
+                echo -e "${RED}[⚠️] La instalación de parted ha fallado.${RESET}"
+                return 1
+            fi
+    fi
 }
 
 # Función para solicitar al usuario que seleccione un dispositivo
@@ -89,16 +134,16 @@ seleccion_almacenamiento() {
 
 # Función para el banner de texto
 print_banner() {
-    echo -e "#---------------------------------------------#"
-    echo -e "\t Instalación de Arch Linux ARM"
-    echo -e "\t      en Raspberry Pi 3 B"
-    echo -e "#---------------------------------------------#"
+    echo -e "#---------------------------------------------#
+        Instalación de Arch Linux ARM
+              en Raspberry Pi 🍇
+#---------------------------------------------#"
 }
 
 # Función para el logotipo de Raspberry Pi
 print_raspberry_icon() {
     echo -e "\t        .~~.   .~~.                "
-    echo -e "\t        '. \ ' ' /.'               "
+    echo -e "\t         '. \' '/.'               "
     echo -e "\t         .~ .~~~..~.               "
     echo -e "\t        : .~.'~'.~. :              "
     echo -e "\t       ~ (   ) (   ) ~             "
@@ -161,6 +206,8 @@ print_info(){
     echo -e "${GREEN}|${RESET} \t\t   - Zero WH                 ${GREEN} |${RESET}"
     echo -e "${GREEN}+---------------------------------------------+${RESET}"
     echo -e "${GREEN}|🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇🍇|${RESET}"
+    sleep 7
+    clear
     
 }
 
@@ -173,6 +220,7 @@ mostrar_menu() {
     echo -e "${GREEN}|${RESET} 1. Verificar conexión a internet           ${GREEN} |${RESET}"
     echo -e "${GREEN}|${RESET} 2. Selección de Micro SD                   ${GREEN} |${RESET}"
     echo -e "${GREEN}|${RESET} 3. Instalación de Arch Linux               ${GREEN} |${RESET}"
+    echo -e "${GREEN}|${RESET} q. Salir                                   ${GREEN} |${RESET}"
     echo -e "${GREEN}|${RESET} x. Versiónes compatibles de Raspberry Pi   ${GREEN} |${RESET}"
     echo -e "${GREEN}+---------------------------------------------+${RESET}"
     echo -ne "${MAGENTA}[*]Ingrese su opción [1-3]:${RESET}"
@@ -193,7 +241,6 @@ show_progress() {
     printf "] %d%%\r" $pct
 }
 
-
 #Instalacion de Arch Linux 
 install_ArchLinux() {
     clear
@@ -203,8 +250,9 @@ install_ArchLinux() {
     if [ -z "$SD_CARD" ]; then
         echo -e "${BLUE}+---------------------------------------------------+${RESET}"
         echo -e "${RED} Error: No se ha especificado el dispositivo MicroSD${RESET}"
+        echo -e "${RED} ⚠️ Seleccione la MicroSD a utilizar, utilizando la${RESET}"
+        echo -e "${RED} opción 2 del menu principal.${RESET}"
         echo -e "${BLUE}+---------------------------------------------------+${RESET}"
-        echo ""
         return
     fi
 
@@ -324,16 +372,22 @@ seleccion_opcion_menu() {
         3)
             install_ArchLinux
             ;;
+        q)
+            echo -e "${GREEN}🐧 Hasta luego...${RESET}"
+            sleep 4
+            clear
+            exit 
+            ;;
         x)
             print_info
             ;;
         *)
-            echo "Opción inválida. Por favor, seleccione una opción válida."
+            echo -e "${RED}Opción inválida. Por favor, seleccione una opción válida.${RESET}"
             ;;
     esac
 }
 
-#print_centrado
+print_centrado
 
 while true; do
     mostrar_menu
