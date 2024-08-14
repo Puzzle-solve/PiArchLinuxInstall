@@ -10,7 +10,6 @@ CYAN='\033[0;36m'
 WHITE='\033[0;37m'
 RESET='\033[0m'  # Resetear colores a los valores por defecto
 
-# Función para mostrar una barra de progreso con Pac-Man comiendo
 mostrar_progreso() {
     local total=3  # Número total de pasos para la barra de progreso
     local progress=0
