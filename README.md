@@ -6,19 +6,22 @@
     <p></p>
 </div>
 
-## Introducción
-
-Este proyecto es una herramienta diseñada para simplificar la instalación y configuración de Arch Linux en la Raspberry Pi, permitiendo a los usuarios disfrutar de una configuración optimizada y lista para usar en diferentes versiones de este popular dispositivo. Nuestra herramienta es especialmente útil para aquellos que desean explorar el potencial de Arch Linux en entornos embebidos y de bajo costo como la Raspberry Pi.
+Este proyecto es una herramienta diseñada para simplificar la instalación y configuración de Arch Linux en la Raspberry Pi, permitiendo a los usuarios disfrutar de una configuración optimizada y lista para usar en diferentes versiones de este popular dispositivo. Está pensado tanto para aquellos usuarios que no cuentan con conocimientos en estas áreas como para personas con un conocimiento muy básico en la instalación de esta distro, ampliando de esta manera la accesibilidad y facilitando el uso de Arch Linux en entornos embebidos y de bajo costo como la Raspberry Pi.
 
 ## Versiones Compatibles de Raspberry Pi
 
 Este proyecto es compatible con las siguientes versiones de Raspberry Pi:
 
-- Raspberry Pi 2 Model B
-- Raspberry Pi 3 Model B/B+
-- Raspberry Pi 4 Model B
-- Raspberry Pi Zero/Zero W
-
+- **Raspberry Pi 2**
+  - Model B
+- **Raspberry Pi 3**
+  - Model B
+- **Raspberry Pi 4**
+  - Model B
+- **Raspberry Pi Zero**
+  - Zero
+  - Zero W
+    
 <div style="text-align: center;">
     <img src="https://tienda.bricogeek.com/2541-thickbox_default/raspberry-pi-model-b.jpg" alt="Raspberry Pi Models" width="300px">
     <p></p>
@@ -36,8 +39,10 @@ Este proyecto está dirigido a entusiastas del software libre y a la comunidad d
 
 Snort es un sistema de detección de intrusiones (IDS) y prevención de intrusiones (IPS) de código abierto que permite monitorizar y analizar el tráfico de red en tiempo real. Es una herramienta poderosa y versátil que puede detectar una amplia variedad de ataques, desde escaneos de puertos hasta intentos de intrusión más complejos. Snort es ampliamente utilizado en la industria de la ciberseguridad para proteger infraestructuras de red contra amenazas potenciales.
 
-![Snort Detection](https://media.giphy.com/media/3oEjI6SIIHBdRxXI40/giphy.gif)  
-*Snort en acción detectando amenazas en tiempo real.*
+<div style="text-align: center;">
+    <img src="https://luismiguelmorales.com/wp-content/uploads/2022/06/snort-image-portada-180.jpg" width="300px">
+    <p></p>
+</div>
 
 ## Herramienta de Instalación y Configuración de Snort
 
