@@ -1,10 +1,10 @@
 # Herramienta de Instalación y Configuración de Arch Linux para Raspberry Pi
 
 
-<div style="width:20%;height:0;padding-bottom:10%;position:relative;"><iframe src="https://giphy.com/embed/lRLzrbhmh5pFf4jOga" width="100%" height="100%" style="position:absolute" frameBorder="0" class="giphy-embed" allowFullScreen></iframe></div>
-
-![Arch Linux Logo](https://upload.wikimedia.org/wikipedia/commons/a/a5/Archlinux-icon-crystal-64.svg)  
-*Automatiza la instalación y configuración de Arch Linux en tu Raspberry Pi.*
+<div style="text-align: center;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/e/e8/Archlinux-logo-standard-version.png" alt="Raspberry Pi Models" width="300px"><img src="https://cdn.worldvectorlogo.com/logos/raspberry-pi.svg" alt="Raspberry Pi Models" width="71px">
+    <p></p>
+</div>
 
 ## Introducción
 
