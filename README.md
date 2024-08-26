@@ -56,23 +56,23 @@ Además de la herramienta de instalación y configuración de Arch Linux, este p
 ```bash
 sudo apt update
 sudo apt install git
-
+```
 ### En Fedora
 ```bash
 sudo dnf install git
-
+```
 ### En CentOS/RHEL
 ```bash
 sudo yum install git
-
+```
 ### En Arch Linux
 ```bash
 sudo pacman -S git
-
+```
 ### En openSUSE
 ```bash
 sudo zypper install git
-
+```
 ### Pasos de Instalación
 
 1. **Clona el repositorio:**
@@ -80,3 +80,4 @@ sudo zypper install git
    ```bash
    git clone https://github.com/tu-usuario/tu-repositorio.git
    cd tu-repositorio
+   ```
