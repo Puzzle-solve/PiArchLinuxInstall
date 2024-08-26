@@ -47,6 +47,32 @@ Snort es un sistema de detección de intrusiones (IDS) y prevención de intrusio
 
 Además de la herramienta de instalación y configuración de Arch Linux, este proyecto incluye una utilidad que facilita la instalación y configuración de Snort en distribuciones derivadas de Debian y Arch Linux. Esta herramienta está diseñada para automatizar el proceso, permitiendo a los usuarios configurar Snort de manera rápida y eficiente, sin necesidad de pasar por complejas configuraciones manuales.
 
+🔔 **Nota Importante:** Para realizar la instalación, asegúrate de tener Git instalado en tu sistema. Además, necesitarás una distribución Linux de tu preferencia. A continuación, se detallan los pasos para instalar Git en diferentes distribuciones de Linux.
+
+## Instalación de Git
+
+### En Debian/Ubuntu
+
+```bash
+sudo apt update
+sudo apt install git
+
+### En Fedora
+```bash
+sudo dnf install git
+
+### En CentOS/RHEL
+```bash
+sudo yum install git
+
+### En Arch Linux
+```bash
+sudo pacman -S git
+
+### En openSUSE
+```bash
+sudo zypper install git
+
 ### Pasos de Instalación
 
 1. **Clona el repositorio:**
