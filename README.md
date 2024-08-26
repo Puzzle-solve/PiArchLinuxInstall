@@ -31,8 +31,7 @@ Este proyecto es compatible con las siguientes versiones de Raspberry Pi:
 
 Este proyecto está dirigido a entusiastas del software libre y a la comunidad de código abierto. Si eres un amante del open source, encontrarás en este proyecto una forma de maximizar las capacidades de tu Raspberry Pi utilizando Arch Linux, una distribución conocida por su flexibilidad, simplicidad y control total sobre el sistema.
 
-<div style="width:100%;height:0;padding-bottom:30%;position:relative;"><iframe src="https://giphy.com/embed/lRLzrbhmh5pFf4jOga" width="100%" height="100%" style="position:absolute" frameBorder="0" class="giphy-embed" allowFullScreen></iframe></div>
-
+![Open Source Enthusiasts](https://media.giphy.com/media/xUPGcguWZHRC2HyBRS/giphy.gif)  
 *Porque creemos en el poder del código abierto.*
 
 ## ¿Qué es Snort?
