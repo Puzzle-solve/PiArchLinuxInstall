@@ -88,11 +88,16 @@ Una de las formas más sencillas y seguras de experimentar con Linux es utilizan
 **¿Cómo empezar?**
 
 1. Descarga e instala el software de tu elección (VMware o VirtualBox).
-2. Crea una nueva máquina virtual y asigna recursos como memoria y almacenamiento.
-3. Descarga una imagen ISO de la distribución Linux que te interese (por ejemplo, Ubuntu o LinuxMint).
-4. Configura la máquina virtual para que arranque desde la imagen ISO y sigue las instrucciones del instalador.
+3. Crea una nueva máquina virtual y asigna recursos como memoria y almacenamiento.
+4. Descarga una imagen ISO de la distribución Linux que te interese (por ejemplo, Ubuntu o LinuxMint).
+5. Configura la máquina virtual para que arranque desde la imagen ISO y sigue las instrucciones del instalador.
 
 Las máquinas virtuales son una excelente manera de probar Linux sin modificar tu sistema principal y permiten volver fácilmente a tu entorno de Windows.
+
+***Material de apoyo***
+En caso de querer ver algun tutorial en Youtube, te dejo el siguiente material:
+- Instalacion de VirtualBox (https://www.youtube.com/watch?v=YFlowDwE-1E)
+- Instalacion de VMware (https://www.youtube.com/watch?v=jFzQUsnlof0)
 
 #### 2. Instalación de WSL (Subsistema de Windows para Linux)
 
@@ -114,12 +119,16 @@ El Subsistema de Windows para Linux (WSL) permite ejecutar una distribución de 
 
 3. **Configura tu distribución:** Después de la instalación, abre la aplicación de Linux desde el menú de inicio y sigue las instrucciones para configurar tu usuario y contraseña.
 
-**¿Cómo instalar WSL?**
+**¿Qué puedes hacer con WSL?**
 - Ejecutar comandos y herramientas de Linux directamente en Windows.
 - Desarrollar y probar aplicaciones en un entorno Linux.
 - Acceder a archivos de Windows y Linux desde ambos sistemas.
 
 WSL ofrece una integración fluida con Windows, permitiendo utilizar las herramientas de Linux mientras mantienes tu entorno Windows principal intacto.
+
+***Material de apoyo***
+En caso de querer ver algun tutorial en Youtube, te dejo el siguiente material:
+- Instalacion de WLS (https://www.youtube.com/watch?v=lt4UtlUzx9w)
 
 ### Pasos de Instalación
 
