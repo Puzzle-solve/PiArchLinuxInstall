@@ -1,0 +1,12 @@
+[Unit]
+Description=Snort Network Intrusion Detection System
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/snort -c /etc/snort/snort.conf -i eth0
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

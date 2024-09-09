@@ -192,7 +192,11 @@ print_banner() {
     echo -e "#---------------------------------------------#
         Instalación de Arch Linux ARM
               en Raspberry Pi 🍇
+              
+                         [Autor]$ puzzle_solve 
+			    SGVsbG8gZnJpZW5k
 #---------------------------------------------#"
+
 }
 
 # Función para el logotipo de Raspberry Pi

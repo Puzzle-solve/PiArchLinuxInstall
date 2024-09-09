@@ -12,6 +12,7 @@ RESET='\033[0m'
 
 banner() {
 clear
+	echo -e "#-----------------------------------------#" | lolcat
     echo -e "
 ███████╗███╗   ██╗ ██████╗ ██████╗ ████████╗
 ██╔════╝████╗  ██║██╔═══██╗██╔══██╗╚══██╔══╝
@@ -20,7 +21,9 @@ clear
 ███████║██║ ╚████║╚██████╔╝██║  ██║   ██║   
 ╚══════╝╚═╝  ╚═══╝ ╚═════╝ ╚═╝  ╚═╝   ╚═╝
 " | lolcat
-    echo -e "\tInstalación y Configuración." | lolcat
+    echo -e "\tInstalación y Configuración.\n" | lolcat
+    echo -e "\t\t    [Autor]$ puzzle_solve" | lolcat
+    echo -e "\t\t       SGVsbG8gZnJpZW5k" | lolcat
     echo -e "#-----------------------------------------#" | lolcat
     echo -e "#-----------------------------------------#" | lolcat
 }
@@ -72,7 +75,6 @@ servicioSnort() {
     mensaje "yellow" "Creando servicio SNORT" "inicio"
   
     local service_file="/etc/systemd/system/snort.service"
-    
     local template_file="snort_service_template.txt"
 
     if [ -f "$service_file" ]; then
@@ -117,10 +119,15 @@ descargaSnort() {
 dependencias() {
 
     mensaje "yellow" "Listo!, ya comenzó la descarga de dependencias" "inicio"
-
-
-    sudo apt install ruby -y &> /dev/null
-    sudo gem install lolcat &> /dev/null
+    
+    if command -v apt &> /dev/null; then
+       sudo apt -y install lolcat &> /dev/null
+    elif command -v pacman &> /dev/null; then
+        sudo pacman -S --noconfirm lolcat &> /dev/null
+    else
+        echo -e "${RED}[⚠️] Distribución no soportada o desconocida. Por favor instala lolcat manualmente.${RESET}"
+        return
+    fi
 
     mensaje "green" "Proceso completo, dependencias instaladas" "fin"
 
@@ -172,8 +179,8 @@ confiRed() {
     mensaje "green" "La interfaz de red de SNORT está lista" "fin"
 }
 
-banner
 dependencias
+banner
 descargaSnort
 confiRed
 servicioSnort
