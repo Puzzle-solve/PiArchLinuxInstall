@@ -131,6 +131,62 @@ seleccion_almacenamiento() {
     fi
 }
 
+instalar_lolcat() {
+
+    if command -v apt &> /dev/null; then
+		#Debian
+        sudo apt install -y lolcat &> /dev/null
+
+    elif command -v dnf &> /dev/null; then
+        # Fedora
+        sudo dnf install -y lolcat &> /dev/null
+
+    elif command -v yum &> /dev/null; then
+        # Red Hat/CentOS
+        sudo yum install -y lolcat &> /dev/null
+
+    elif command -v pacman &> /dev/null; then
+        # Arch Linux
+        sudo pacman -S lolcat --noconfirm &> /dev/null
+
+    elif command -v zypper &> /dev/null; then
+        # openSUSE
+        sudo zypper install -y lolcat &> /dev/null
+        sudo gem install lolcat &> /dev/null
+
+    elif command -v apk &> /dev/null; then
+        # Alpine Linux
+        sudo apk update &> /dev/null
+        sudo apk add ruby ruby-dev build-base &> /dev/null
+        sudo gem install lolcat &> /dev/null
+
+    elif command -v xbps-install &> /dev/null; then
+        # Void Linux
+        sudo xbps-install -Sy ruby &> /dev/null
+        sudo gem install lolcat &> /dev/null
+
+    elif command -v eopkg &> /dev/null; then
+        # Solus
+        sudo eopkg it -y ruby &> /dev/null
+        sudo gem install lolcat &> /dev/null
+
+    elif command -v guix &> /dev/null; then
+        # GNU Guix System
+        sudo guix install ruby &> /dev/null
+        gem install lolcat &> /dev/null
+
+    elif command -v nix &> /dev/null; then
+        # NixOS
+        nix-env -iA nixpkgs.ruby &> /dev/null
+        gem install lolcat &> /dev/null
+
+    else
+		echo -e "${RED}Distribución no soportada o desconocida. Por favor, instala lolcat manualmente.${RESET}"
+        return 1
+    fi
+}
+
+
 # Función para el banner de texto
 print_banner() {
     echo -e "#---------------------------------------------#
@@ -155,6 +211,7 @@ print_raspberry_icon() {
 
 # Función para imprimir el banner e ícono centrados
 print_centrado() {
+	instalar_lolcat
     local banner=$(print_banner)
     local icon=$(print_raspberry_icon)
     
